@@ -1,0 +1,1 @@
+Naive implementation of the RSA cryptosystem for learning purposes, with scripts to encrypt, decrypt and generate key pairs, as well as a brute force algorithm to break (or attempt to break) the security of an cipher message.
