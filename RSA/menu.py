@@ -5,6 +5,8 @@ MODULUS_B = 2**18
 SECURITY = 5 # Security parameter of Miller–Rabin primality test 
 
 def fast_exp(integer:int, exp:int, modulus:int)-> int:
+    """ Calculates (integer^exp) % modulus in linear time with the bit-lenght of exp"""
+    
     num = bin(exp)
     m = len(num)
     result = integer
@@ -17,6 +19,8 @@ def fast_exp(integer:int, exp:int, modulus:int)-> int:
     return result
 
 def isPrime(p:int)-> bool:
+    """ Return True if p is likely prime, False otherwise"""
+    
     # Factoring p - 1 = (2^u).r
     p_ = p-1
     u = 0
@@ -40,7 +44,8 @@ def isPrime(p:int)-> bool:
     return True 
     
   
-def choose_prime(a, b, exception):
+def choose_prime(a, b, exception=0):
+    """ Choose a (probably) prime p in range [a,b], and p != exception """
     find = False
     while not find:
         p = random.randint(a, b) | 1 # the bitwise-or guarantees that p is a odd number
@@ -49,7 +54,10 @@ def choose_prime(a, b, exception):
         
     return p
 
-def gdc(r0,r1)-> tuple:
+def gdc_inv(r0,r1)-> tuple:
+    """ Calculates the greatest divisor commun (gdc) between r0 and r1
+    Return the gdc and the modular inverse of r1"""
+    
     # Extended Euclidian Algorithm
     s0, t0 = 1, 0 
     s1, t1 = 0, 1
@@ -77,14 +85,16 @@ def gdc(r0,r1)-> tuple:
     return r1, t1  # s is not useful
         
     
-def choose_keys(phi):
+def choose_keys(p, q):
+    """ Takes 2 primes p and q and returns a pair of public and private keys associated with them """
+    phi = (p-1)*(q-1)
     used = {1}
     while True:
         e = random.randint(3, phi-1)
         if e in used:
             continue
         used.add(e)
-        divisor, inv_e = gdc(e, phi)
+        divisor, inv_e = gdc_inv(phi, e)
         if divisor == 1:
             break
 
@@ -131,9 +141,8 @@ def main():
             p = choose_prime(MODULUS_A, MODULUS_B, 0)
             q = choose_prime(MODULUS_A, MODULUS_B, p)
             n = p*q
-            phi = (p-1)*(q-1)
             print("The RSA modulus is: "+ str(n))
-            e, d = choose_keys(phi)
+            e, d = choose_keys(p, q, n)
             print("Your public-key is:")
             print(str(e)+"\n")
             print("Your private-key is:")
