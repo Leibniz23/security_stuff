@@ -44,7 +44,7 @@ def isPrime(p:int)-> bool:
     return True 
     
   
-def choose_prime(a, b, exception=0):
+def choose_prime(a:int, b:int, exception=0)-> int:
     """ Choose a (probably) prime p in range [a,b], and p != exception """
     find = False
     while not find:
@@ -54,7 +54,7 @@ def choose_prime(a, b, exception=0):
         
     return p
 
-def gdc_inv(r0,r1)-> tuple:
+def gdc_inv(r0:int, r1:int)-> tuple:
     """ Calculates the greatest divisor commun (gdc) between r0 and r1
     Return the gdc and the modular inverse of r1"""
     
@@ -85,7 +85,7 @@ def gdc_inv(r0,r1)-> tuple:
     return r1, t1  # s is not useful
         
     
-def choose_keys(p, q):
+def choose_keys(p:int, q:int)-> int:
     """ Takes 2 primes p and q and returns a pair of public and private keys associated with them """
     phi = (p-1)*(q-1)
     used = {1}
@@ -102,7 +102,7 @@ def choose_keys(p, q):
     
     return e, d
 
-def encrypt(plaintext, key, n):
+def encrypt(plaintext:str, key:int, n:int)-> str:
     cipher = ""
     for letter in plaintext:
         code = ord(letter)
@@ -110,7 +110,7 @@ def encrypt(plaintext, key, n):
         
     return cipher
 
-def decrypt(ciphertext, key, n):
+def decrypt(ciphertext:str, key:int, n:int)-> str:
     char = ciphertext.split(".")
     plain = ""
     i = 0
@@ -138,11 +138,11 @@ def main():
         if code == 1:
             print("RSA-KEYS GENERATOR\n")
             print("Working...")
-            p = choose_prime(MODULUS_A, MODULUS_B, 0)
+            p = choose_prime(MODULUS_A, MODULUS_B)
             q = choose_prime(MODULUS_A, MODULUS_B, p)
             n = p*q
             print("The RSA modulus is: "+ str(n))
-            e, d = choose_keys(p, q, n)
+            e, d = choose_keys(p, q)
             print("Your public-key is:")
             print(str(e)+"\n")
             print("Your private-key is:")
@@ -177,8 +177,6 @@ def main():
             # continue
             
         if code == 0:
-            lista = encrypt("plaintext", 3, 33)
-            novo = decrypt(lista, 7, 33)
             print("Goodbye!")
             break
     
