@@ -1,8 +1,8 @@
 import random
 import math
 
-MODULUS_A = 2**16
-MODULUS_B = 2**18
+MODULUS_A = 2**255
+MODULUS_B = 2**257
 SECURITY = 10 # Security parameter of Miller–Rabin primality test
 A_TEST = 1000
 B_TEST = 100000
