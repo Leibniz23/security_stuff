@@ -4,7 +4,7 @@ import math
 MODULUS_A = 2**16
 MODULUS_B = 2**18
 SECURITY = 10 # Security parameter of Miller–Rabin primality test
-A_TEST = 100
+A_TEST = 1000
 B_TEST = 100000
 
 def fast_exp(integer:int, exp:int, modulus:int)-> int:
@@ -142,7 +142,7 @@ def test_fast_exp(n = 0, z = 10)-> None:
         
     print("fast_exp OK")
     
-def test_prime(z = 50):
+def test_prime(z = 100):
     for _ in range(z):
         p = choose_prime(A_TEST, B_TEST)
         try:
@@ -170,7 +170,7 @@ def test_gdc_inv(z = 1000):
     print("gdc_inv OK")
         
     
-def final_test(z = 100)-> None:
+def final_test(z = 1000)-> None:
     for _ in range(SECURITY):
         p = choose_prime(MODULUS_A, MODULUS_B)
         q = choose_prime(MODULUS_A, MODULUS_B, p)
