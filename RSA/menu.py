@@ -1,12 +1,15 @@
 import random
+import math
 
 MODULUS_A = 2**16
 MODULUS_B = 2**18
-SECURITY = 5 # Security parameter of Miller–Rabin primality test 
+SECURITY = 10 # Security parameter of Miller–Rabin primality test
+A_TEST = 100
+B_TEST = 100000
 
 def fast_exp(integer:int, exp:int, modulus:int)-> int:
     """ Calculates (integer^exp) % modulus in linear time with the bit-lenght of exp"""
-    
+
     num = bin(exp)
     m = len(num)
     result = integer
@@ -84,7 +87,13 @@ def gdc_inv(r0:int, r1:int)-> tuple:
     
     return r1, t1  # s is not useful
         
-    
+def slow_isprime(n):
+  for i in range(2,int(math.sqrt(n))+1):
+    if n % i == 0:
+      return False
+  
+  return True
+
 def choose_keys(p:int, q:int)-> int:
     """ Takes 2 primes p and q and returns a pair of public and private keys associated with them """
     phi = (p-1)*(q-1)
@@ -102,35 +111,82 @@ def choose_keys(p:int, q:int)-> int:
     
     return e, d
 
-def encrypt(plaintext:str, key:int, n:int)-> str:
-    cipher = ""
-    for letter in plaintext:
-        code = ord(letter)
-        cipher += (str(fast_exp(code, key, n))+'.')
-        
-    return cipher
+def encrypt(plaintext:int, key:int, n:int)-> int:
+    try:
+        assert(plaintext < n)
+    except AssertionError:
+        print("--------------------")
+        print("Invalid message")
+        print("--------------------")
+        return
+    
+    return fast_exp(plaintext, key, n)
 
-def decrypt(ciphertext:str, key:int, n:int)-> str:
-    char = ciphertext.split(".")
-    plain = ""
+def decrypt(ciphertext:int, key:int, n:int)-> str:
+    return fast_exp(ciphertext, key, n)
+
+def test_fast_exp(n = 0, z = 10)-> None:
     i = 0
-    while char[i] != "" and i < len(char):
-        code = int(char[i])
+    while i < z:
+        a = random.randint(A_TEST, B_TEST)
+        b = random.randint(A_TEST, B_TEST)
+        if n == 0:
+            n = a 
+        result = fast_exp(a, b, n)
+        expected = pow(a, b, n)
         try:
-            plain += chr(fast_exp(code, key, n))
-        except ValueError:
-            print("Something was wrong! Check out your keys and try again")
-            return "\0"
-        i += 1
+            assert(result==expected)
+        except AssertionError:
+            print("fast_exp is not working")
+        i+= 1
+        
+    print("fast_exp OK")
+    
+def test_prime(z = 50):
+    for _ in range(z):
+        p = choose_prime(A_TEST, B_TEST)
+        try:
+            assert(slow_isprime(p))
+        except AssertionError:
+            print("choose_prime is not working")
+            return
             
-    return plain
+    print("choose_prime OK")
+    
+def test_gdc_inv(z = 1000):
+    for _ in range(z):
+        p = choose_prime(MODULUS_A, MODULUS_B)
+        q = choose_prime(MODULUS_A, MODULUS_B, p)
+        e, d = choose_keys(p, q)
+        phi = (p-1)*(q-1)
+        divisor, inv = gdc_inv(phi, e)
+        try:
+            assert(divisor == 1)
+            assert((e*inv) % phi) == 1
+        except AssertionError:
+            print("gdc_inv is not working")
+            return
+        
+    print("gdc_inv OK")
+        
+    
+def final_test(z = 100)-> None:
+    for _ in range(SECURITY):
+        p = choose_prime(MODULUS_A, MODULUS_B)
+        q = choose_prime(MODULUS_A, MODULUS_B, p)
+        modulus = p*q
+        public, private = choose_keys(p, q)
+        for _ in range(z):
+            message = random.randint(0, modulus-1)
+            assert decrypt(encrypt(message, public, modulus), private, modulus) == message
+    
+    return
 
 def main():
     print("Welcome to RSA Manager Keys")
     while True:
         print("1 - Keys generator")
-        print("2 - Encryption")
-        print("3 - Decryption")
+        print("2 - Function's test")
         print("0 - Exit")
         print("--------------------")
         print("What service do you need?")
@@ -151,30 +207,13 @@ def main():
             continue
         
         if code == 2:
-            print("Insert the ciphertext to encryption:")
-            plaintext = input()
-            print("Insert your RSA public key:")
-            key = int(input())
-            print("Insert your RSA key modulus:")
-            n = int(input())
-            ciphertext = encrypt(plaintext, key, n)
-            print("Your ciphertext is as follows:\n")
-            print(ciphertext)
-            continue
-            
-        if code == 3:
-            print("Feature not developed... coming soon")
-            # print("Insert the plaintext to decryption:")
-            # ciphertext = input()
-            # print("Insert your RSA private key:")
-            # key = int(input())
-            # print("Insert your RSA key modulus:")
-            # n = int(input())
-            # plaintext = decrypt(ciphertext, key, n)
-            # if plaintext != "\0":
-            #     print("Your plaintext is as follows:\n")
-            #     print(plaintext)
-            # continue
+            print("--------------------")
+            test_fast_exp()
+            test_prime()
+            test_gdc_inv()
+            final_test()
+            print("Everything OK!")
+            print("--------------------")
             
         if code == 0:
             print("Goodbye!")
