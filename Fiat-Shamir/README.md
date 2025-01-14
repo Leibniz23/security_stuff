@@ -1,0 +1,1 @@
+Implementation of Schnorr's identification scheme, a classic interactive protocol that demonstrates the concept of zero-knowledge proofs. Additionally, a signature scheme version of the same protocol is implemented, using the Fiat-Shamir transformation to convert it into a non-interactive scheme.
