@@ -1,1 +1,1 @@
-Research and discoveries in Information Security and Cryptography.
+Research in Information Security and Cryptography.
